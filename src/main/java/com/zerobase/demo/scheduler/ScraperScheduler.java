@@ -30,22 +30,11 @@ public class ScraperScheduler {
         // log.info("scraping scheduler is started");
 
         List<CompanyEntity> companies = this.companyRepository.findAll();
+
         for (CompanyEntity company : companies) {
             log.info("scraping scheduler is started ->" + company.getName());
-            ScrapedResult scrapedResult = this.yahooFinanceScraper.scrap(Company.builder()
-                    .name(company.getName())
-                    .ticker(company.getTicker())
-                    .build());
-
-            scrapedResult.getDividendEntities().stream()
-                    .map(e -> new DividendEntity(company.getId(), e))
-                    .forEach(e -> {
-                        boolean exists = this.dividendRepository.existsByCompanyIdAndDate(e.getCompanyId(),
-                                e.getDate());
-                        if (!exists) {
-                            this.dividendRepository.save(e);
-                        }
-                    });
+            ScrapedResult scrapedResult = this.yahooFinanceScraper.scrap(new Company(company.getTicker(), company.getName()));
+            scrapedResult.getDividendEntities().stream();
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e1) {
@@ -53,6 +42,5 @@ public class ScraperScheduler {
                 e1.printStackTrace();
             }
         }
-
     }
 }
