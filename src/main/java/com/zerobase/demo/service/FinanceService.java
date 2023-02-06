@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.zerobase.demo.model.Company;
 import com.zerobase.demo.model.Dividend;
 import com.zerobase.demo.model.ScrapedResult;
+import com.zerobase.demo.model.constants.CacheKey;
 import com.zerobase.demo.persist.CompanyRepository;
 import com.zerobase.demo.persist.DividendRepository;
 import com.zerobase.demo.persist.entity.CompanyEntity;
@@ -23,7 +24,7 @@ public class FinanceService {
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
 
-    @Cacheable(key = "#companyName", value = "finance")
+    @Cacheable(key = "#companyName", value = CacheKey.KEY_FINANCE)
     public ScrapedResult getDividendByCompanyName(String companyNmae) {
         CompanyEntity company = this.companyRepository.findByName(companyNmae)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 회사명입니다."));

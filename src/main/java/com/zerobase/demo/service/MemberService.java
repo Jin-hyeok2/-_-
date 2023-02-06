@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MemeberService implements UserDetailsService {
+public class MemberService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
@@ -24,7 +24,7 @@ public class MemeberService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         this.memberRepository.findByUsername(username)
-        .orElseThrow(() -> new UsernameNotFoundException("couldn't find user -> " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("couldn't find user -> " + username));
         return null;
     }
 
@@ -41,7 +41,14 @@ public class MemeberService implements UserDetailsService {
     }
 
     public MemberEntity authenticate(Auth.SignIn member) {
-        return null;
+
+        var user = this.memberRepository.findByUsername(member.getUsername())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 ID입니다"));
+
+        if (!this.passwordEncoder.matches(member.getPassword(), user.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다");
+        }
+        return user;
     }
-    
+
 }
